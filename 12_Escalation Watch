@@ -1,0 +1,43 @@
+//LIB CONNECT TO 'Ivanti BI Server -NVZ- PRD (OLEDB) (staff_bmagurn)';
+LIB CONNECT TO 'DATA - ITSM (DW):SQL_ivanti_PRD (staff_bmagurn)';
+
+[ESCALATION_WATCH]:
+//LOAD * where exists(RecId);
+LOAD
+	
+	//ParentLink_RecID as [RecId],
+	//[RecId] AS [ResolutionEscLink_RecID],
+    RecId,
+    [EscalationScheduleLi_RecID],
+	[TargetClockDuration],
+	[L1DateTime],
+	[L2DateTime],
+	[L3DateTime],
+	[BreachDateTime],
+	[L1Passed],
+	[L2Passed],
+	[L3Passed],
+	[BreachPassed],
+    [TotalRunningDuration],
+	[ParentLink_RecID],
+	[ParentLink_Category] AS [Frs_data_escalation_watch.ParentLink_Category]
+   // WHERE exists([RecId],[ResolutionEscLink_RecID])
+    ;
+  
+   SELECT 
+   	ParentLink_RecID,
+    RecId,
+	"EscalationScheduleLi_RecID",
+	TargetClockDuration,
+    TotalRunningDuration,
+    ResponseDateTime,
+    L1DateTime,
+	L2DateTime,
+	L3DateTime,
+	BreachDateTime,
+	L1Passed,
+	L2Passed,
+	L3Passed,
+	BreachPassed,
+	"ParentLink_Category"
+FROM "IAMC_LCPS_PRD_NA".dbo."Frs_data_escalation_watch";
