@@ -1,0 +1,41 @@
+//LIB CONNECT TO 'Ivanti BI Server -NVZ- PRD (OLEDB) (staff_bmagurn)';
+//LIB CONNECT TO 'bis-us1.saasit.com,31441 (STAFF_bmagurn)';
+LIB CONNECT TO 'DATA - ITSM (DW):SQL_ivanti_PRD (staff_bmagurn)';
+
+
+[INVENTORY_TRANSACTION]:
+Unqualify RecId;
+NoConcatenate
+//LOAD RecId as AuditHistoryRecId,
+//    AuditHistoryUpdatedRecId as RecId,
+    
+LOAD RecId as InventoryTransaction_RecId,
+    CreatedBy,
+    CreatedDateTime,
+    LastModBy,
+    LastModDateTime,
+    "ivnt_CheckedOutTo",
+    "ivnt_AssetLink_RecID" as RecId,
+    "ivnt_Location",
+    "ivnt_StorageSpace",
+    "ivnt_StorageSpaceLink_Category",
+    "ivnt_StorageSpaceLink_RecID",
+    "ivnt_TransactionType",
+    "ivnt_CheckedOutTo_Valid";
+SQL SELECT RecId,
+    CreatedBy,
+    CreatedDateTime,
+    LastModBy,
+    LastModDateTime,
+    "ivnt_CheckedOutTo",
+    "ivnt_AssetLink_RecID",
+    "ivnt_Location",
+    "ivnt_StorageSpace",
+    "ivnt_StorageSpaceLink_Category",
+    "ivnt_StorageSpaceLink_RecID",
+    "ivnt_TransactionType",
+    "ivnt_CheckedOutTo_Valid"
+FROM "IAMC_LCPS_PRD_NA".dbo."ivnt_InventoryTransaction";
+
+STORE * FROM [INVENTORY_TRANSACTION] INTO 'lib://DATA - ITSM (DW):SharedConnectToQvdITSM/InventoryTransactionV1.QVD';
+DROP TABLE [INVENTORY_TRANSACTION];
