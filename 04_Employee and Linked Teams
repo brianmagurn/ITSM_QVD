@@ -1,0 +1,267 @@
+Unqualify *;
+
+//LIB CONNECT TO 'bis-us1.saasit.com,31441 (STAFF_bmagurn)';
+//LIB CONNECT TO 'Ivanti BI Server -NVZ- PRD (OLEDB) (staff_bmagurn)';
+LIB CONNECT TO 'DATA - ITSM (DW):SQL_ivanti_PRD (staff_bmagurn)';
+
+
+NullAsNull [Supervisor],[ManagerPID_forImport];
+[Employee]:
+LOAD
+//	[ContactId],
+//	[CostCentre],
+//	[CreatedBy],
+	[CreatedDateTime],
+	[Disabled],
+	[DisplayName],
+	[FirstName],
+    [LastName],
+	[OrganizationalUnit],
+	[Phone1],
+    [PrimaryEmail],
+    [LoginID],
+    [Title],
+    [CustID], //aka Employee ID
+    
+    [EmployeeLocation],
+    [EmployeeLocation_Valid],  
+    [RecId],
+    [RecId] as [Employee_PK],
+    [Supervisor],  //will be populated in near future from Oracle feed.
+	IF([Student]='Yes','Student','Staff') as [IsStudent],
+    IF(IsNull([Team]),
+    	IF([Student]='Yes','Student User','Staff User')
+    	,'Staff Analyst') as [IsAnalyst],
+    [Team] as [Default Team],
+    //[SIS_Location],
+	[Grade],
+	[SIS_Grade],
+	[GraduationYear],
+    [CE_School],
+	[Domain],
+	[PhysicalDeliveryOfficeLocation],
+	
+
+
+//Technical Back End Crap that is probably only useful to me.
+	[InternalAuthPasswd],
+	[InternalPwdDateTime],
+	[IsAutoProvisioned],
+	[IsExternalAuth],
+	[IsInternalAuth],
+	[IsNamedUser],
+	[LastExternalLoginId],
+	[LastModBy],
+	[LastModDateTime],
+	[Status],
+    
+	
+
+//	[Owner_Valid],
+//	[Owner],
+//	[ParentLink_Category],
+//	[ParentLink_RecID],
+//	[PasswordExpiration],
+	
+//	[Phone2],
+//	[Prefix_Valid],
+//	[Prefix],
+
+//  [ProfileID],
+//	[ReadOnly],
+
+	
+//	[Suffix_Valid],
+//	[Suffix],
+	
+	[Team_Valid],
+	
+//	[TeamEmail],
+//	[TeamManagerEmail],
+	[TempInternalAuthPassword],
+	[TempPwdDatetime],
+	[TerminatedDate],
+	
+//	[VIP],
+	[DN],
+	[Address1Line2] as 'LDAP Import Name', 
+//	[NamedLicenseBundle_Valid],
+//	[NamedLicenseBundle],
+//	[CreationSource],
+
+//	[Phone1Ext],
+//	[Phone2Ext],
+//	[WeeklyAvailability],
+//	[GlobalId],
+//	[SIS_Location_Valid],
+	
+    [memberOf],
+	[AssetsAssigned],
+//	[CI_Link_Category],
+//	[CI_Link_RecID],
+	
+	[ManagerPID_forImport],
+	[IsManager],
+	[ManagedEmployees];
+SELECT ContactId,
+	CostCentre,
+	CreatedBy,
+	CreatedDateTime,
+	Disabled,
+	DisplayName,
+	"EmployeeLocation_Valid",
+	EmployeeLocation,
+	FirstName,
+	"IPCM_SearchableByName",
+	"IPCM_UILanguage_Valid",
+	"IPCM_UILanguage",
+	"IPCM_VOIPLink_Category",
+	"IPCM_VOIPLink_RecID",
+	"IPCM_VoiceAgent",
+	"IPCM_VoiceSupervisor",
+	"IPCM_WrapupSeconds",
+	"IPCM_WrapupTimeout_Valid",
+	"IPCM_WrapupTimeout",
+	IVRPinCode,
+	IdentityId,
+	InternalAuthPasswd,
+	InternalPwdDateTime,
+	IsAutoProvisioned,
+	IsExternalAuth,
+	IsInternalAuth,
+	IsNamedUser,
+	LastExternalLoginId,
+	LastModBy,
+	LastModDateTime,
+	LastName,
+	LoginID,
+	OrganizationalUnit,
+	"OrganizationalUnit_de",
+	"OrganizationalUnit_es",
+	"OrganizationalUnit_fr",
+	"OrganizationalUnit_nl",
+	"OrganizationalUnit_pt_BR",
+	"OrganizationalUnit_ru",
+	"OrganizationalUnit_ja",
+	"OrganizationalUnit_zh_CN",
+	"OrganizationalUnit_it",
+	"OrganizationalUnit_pl",
+	"OrganizationalUnit_zh_TW",
+	"Owner_Valid",
+	Owner,
+	"ParentLink_Category",
+	"ParentLink_RecID",
+	PasswordExpiration,
+	Phone1,
+	Phone2,
+	"Prefix_Valid",
+	Prefix,
+	PrimaryEmail,
+	ProfileID,
+	ReadOnly,
+	RecId,
+	Status,
+	"Suffix_Valid",
+	Suffix,
+	Supervisor,
+	"Team_Valid",
+	Team,
+	TeamEmail,
+	TeamManagerEmail,
+	TempInternalAuthPassword,
+	TempPwdDatetime,
+	TerminatedDate,
+	Title,
+	VIP,
+	DN,
+	Address1Line2,
+	"NamedLicenseBundle_Valid",
+	NamedLicenseBundle,
+	CreationSource,
+	CustID,
+	Phone1Ext,
+	Phone2Ext,
+	WeeklyAvailability,
+	GlobalId,
+	//"SIS_Location_Valid",
+	//"SIS_Location",
+	Grade,
+	"SIS_Grade",
+	GraduationYear,
+	memberOf,
+	Student,
+	AssetsAssigned,
+	"CI_Link_Category",
+	"CI_Link_RecID",
+	"CE_School",
+	"Domain",
+	PhysicalDeliveryOfficeLocation,
+	"ManagerPID_forImport",
+	IsManager,
+	ManagedEmployees
+FROM "IAMC_LCPS_PRD_NA".dbo.Employee;
+
+//LIB CONNECT TO 'bis-us1.saasit.com,31441 (STAFF_bmagurn)';
+//LIB CONNECT TO 'Ivanti BI Server -NVZ- PRD (OLEDB) (staff_bmagurn)';
+LIB CONNECT TO 'DATA - ITSM (DW):SQL_ivanti_PRD (staff_bmagurn)';
+
+
+
+[LinkedTeams]:
+LOAD Employee_PK, 
+	 Team_PK
+;
+
+SELECT Employee.DisplayName, Employee.LoginID, Employee.RecId as Employee_PK,  StandardUserTeam.RecId as Team_PK, StandardUserTeam.Team
+FROM FusionLink
+	INNER JOIN StandardUserTeam ON FusionLink.sourceID = StandardUserTeam.RecId
+	Inner join Employee ON FusionLink.targetID = Employee.RecId and targetbase = 'Employee' and SourceBase = 'StandardUserTeam'
+
+	WHERE FusionLink.RelationshipName = 'ProfileEmployeeAssociatedByStandardUserTeam'
+;
+
+Join (Employee)
+LOAD Employee_PK, 
+	 COUNT(Team_PK) As 'Linked Teams'
+          Resident LinkedTeams
+          Group By Employee_PK;
+    
+ 
+ 
+ 
+ 
+  
+//LIB CONNECT TO 'bis-us1.saasit.com,31441 (STAFF_bmagurn)';
+//LIB CONNECT TO 'Ivanti BI Server -NVZ- PRD (OLEDB) (staff_bmagurn)';
+LIB CONNECT TO 'DATA - ITSM (DW):SQL_ivanti_PRD (staff_bmagurn)';
+
+
+Join (LinkedTeams)
+LOAD 
+	RecId as Team_PK, 
+	Team as TeamName, 
+	TeamEmail, 
+	TeamManager, 
+	TeamManagerEmail, 
+	IsServiceDesk, 
+	AD_Code as TEAMAD_Code, 
+	DDI_Support_Team_Valid,
+	DDI_Support_Team as [Team DDI_Support_Team], 
+	TeamManager_Valid, 
+	KnowledgeApproverTeam, 
+	IsChangeTeam;
+
+//[StandardUserTeam]:
+SELECT RecId,
+	Team,
+	TeamEmail,
+	TeamManager,
+	TeamManagerEmail,
+	IsServiceDesk,
+	"AD_Code",
+	"DDI_Support_Team_Valid",
+	"DDI_Support_Team",
+	"TeamManager_Valid",
+	KnowledgeApproverTeam,
+	IsChangeTeam
+FROM "IAMC_LCPS_PRD_NA".dbo.StandardUserTeam;
