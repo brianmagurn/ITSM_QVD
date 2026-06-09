@@ -1,0 +1,11 @@
+STORE * FROM [Incident] INTO 'lib://DATA - ITSM (DW):SharedConnectToQvdITSM/IncidentV2.QVD';
+[DataLastLoaded]:
+NoConcatenate
+LOAD MAX([CreatedDateTimeLocal]) as LatestIncidentCreated,
+    MAX([ResolvedDateTimeLocal]) as LatestIncidentResolved,
+    MAX([LastModDateTimeLocal]) as LatestIncidentModified ,
+    MAX([RespondedDateTimeLocal]) as LatestIncidentResponded,
+    MAX(ID) as LatestIncidentID
+    Resident Incident;
+
+DROP TABLE [Incident];
