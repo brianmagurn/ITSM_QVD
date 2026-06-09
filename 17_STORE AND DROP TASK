@@ -1,0 +1,2 @@
+STORE * FROM [Task] INTO  'lib://DATA - ITSM (DW):SharedConnectToQvdITSM/TaskV1.QVD';
+DROP TABLE [Task];
