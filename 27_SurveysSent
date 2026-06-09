@@ -1,0 +1,21 @@
+//LIB CONNECT TO 'bis-us1.saasit.com,31441 (STAFF_bmagurn)';
+//LIB CONNECT TO 'Ivanti BI Server -NVZ- PRD (OLEDB) (staff_bmagurn)';
+LIB CONNECT TO 'DATA - ITSM (DW):SQL_ivanti_PRD (staff_bmagurn)';
+
+
+
+LOAD IncidentNumber as 'ParentId', 
+	SendSurveyNotification,
+    ConvertToLocalTime([ClosedDateTime], 'Eastern Time (US & Canada)') AS [SurveySentDateTimeLocal],
+    '0' AS SurveyCompleted 
+ Where Not Exists([ParentId], IncidentNumber);
+
+[SurveysSent]:
+
+SELECT IncidentNumber,
+ClosedDateTime,
+	SendSurveyNotification
+FROM "IAMC_LCPS_PRD_NA".dbo.Incident 
+WHERE Status='Closed'
+AND SendSurveyNotification='1'
+;
