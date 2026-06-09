@@ -1,0 +1,46 @@
+Unqualify *;
+
+[TemplateNameMapping]:
+MAPPING LOAD * INLINE
+[
+TemplateNameMapping-FROM,TemplateNameMapping-TO
+Software and Device Configuration Request - Backup 02-07-2,SW Device Configuration
+Software and Device Configuration Request,SW Device Configuration
+Request Permission Click,Permission Click Request
+Permission Click Request,Permission Click Request
+Permission Click Request v1,Permission Click Request
+Permission Click Request - Backup 02-07-2020,Permission Click Request
+Phoenix Special Education (SE) Request,Phoenix SE support Request
+Phoenix Special Education (SE) Request - Backup 02-07-2020,Phoenix SE support Request
+Request Phoenix SE support,Phoenix SE support Request
+Phoenix SE support Request v1,Phoenix SE support Request
+LEAD Password Reset Request - Backup 02-07-2020,LEAD Password Reset Request
+LEAD Password Reset Request,LEAD Password Reset Request
+LEAD Password Reset Request v1,LEAD Password Reset Request
+Request LEAD Password Reset,LEAD Password Reset Request
+Generic Service Request (old),Generic Service Request
+Generic Service Request v1,Generic Service Request
+Student Device Request - Backup 02-07-2020,Student Device Request
+Student Device Request v1,Student Device Request
+Request Oracle Password Reset,Oracle Password Reset Request
+Oracle Password Reset Request- Backup 02-07-2020,Oracle Password Reset Request
+Oracle Password Reset Request v1,Oracle Password Reset Request
+Oracle Password Reset Requests,Oracle Password Reset Request
+Staff Device Request,Staff Device
+Staff Device Request - Backup 02-07-2020,Staff Device
+Request Staff Device,Staff Device
+Qlik Visualization Request - Backup 02-07-2020,Qlik Visualization
+Request Qlik Visualization,Qlik Visualization
+Qlik Visualization Request,Qlik Visualization
+];
+[ServiceReq_temp_3c74ddc0-c2f5-b32e-1f0f-8b9a4d1d]:
+LOAD
+	*, APPLYMAP( 'TemplateNameMapping', [TemplateName1]) AS [TemplateName]
+
+RESIDENT [ServiceReq];
+DROP TABLE [ServiceReq];
+DROP FIELD [TemplateName1];
+
+
+
+RENAME TABLE [ServiceReq_temp_3c74ddc0-c2f5-b32e-1f0f-8b9a4d1d] to [ServiceReq];
