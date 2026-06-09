@@ -1,0 +1,130 @@
+//LIB CONNECT TO 'bis-us1.saasit.com,31441 (STAFF_bmagurn)';
+//LIB CONNECT TO 'Ivanti BI Server -NVZ- PRD (OLEDB) (staff_bmagurn)';
+LIB CONNECT TO 'DATA - ITSM (DW):SQL_ivanti_PRD (staff_bmagurn)';
+
+
+[SR Status]:
+Mapping LOAD * ;
+
+SELECT 
+	Status, 
+    SortOrder
+
+FROM "IAMC_LCPS_PRD_NA".dbo.ServiceReqStatus;
+
+
+[ServiceReq]:
+//NullAsValue *;
+//Set NullValue = 'NULL';
+NullAsNull *;
+LOAD
+	[RecId],
+	[LastModBy],
+    
+    // ----- DATE FIELDS GO HERE ------
+    ConvertToLocalTime([CreatedDateTime], 'Eastern Time (US & Canada)') AS [CreatedDateTimeLocal],
+    ConvertToLocalTime([ResolvedDateTime], 'Eastern Time (US & Canada)') AS [ResolvedDateTimeLocal] 
+    ,ConvertToLocalTime([ClosedDateTime], 'Eastern Time (US & Canada)') AS [ClosedDateTimeLocal]
+    ,ConvertToLocalTime([LastModDateTime], 'Eastern Time (US & Canada)') AS [LastModDateTimeLocal]  ,
+    //ConvertToLocalTime([RespondedDateTime], 'Eastern Time (US & Canada)') AS [RespondedDateTimeLocal],
+    	// there is no "RespondedDateTime" field ON SR. WTF?!
+    // ----- End date fields ----------
+    
+    
+	
+	[CreatedBy],
+	[Owner],
+	[Owner_Valid],
+	[OwnerTeam],
+	[OwnerTeam_Valid],
+	[ServiceReqNumber] as [ID],
+    	'https://lcps-amc.saasit.com/Default.aspx?Scope=ObjectWorkspace&CommandId=Search&'
+        &'ObjectType=ServiceReq%23&CommandData=ServiceReqNumber%2c%3d%2c0%2c'
+        &[ServiceReqNumber]&'%2cstring%2cAND%7c'	
+        as [Link],
+    'Service Request' as [TicketType],
+	[ResolvedBy],
+    [ClosedBy],
+    
+	
+	[ProfileLink_RecID] AS [Customer_RecID],
+	[ProfileFullName] AS [Customer],
+	[CustomerLocation] as [Location],
+	[IsVIP] AS [ServiceReq.IsVIP],
+	[AlternateContactLink_RecID] AS [ServiceReq.AlternateContactLink_RecID],
+	//[Status] as [Status],
+    DUAL ([Status], APPLYMAP('SR Status', [Status])) AS [Status],
+    [Status] as [OriginalStatus],
+	[Service],
+    [Category] AS [ServiceReq.Category],
+	[Subcategory] AS [ServiceReq.Subcategory],
+	[Source] AS [ServiceReq.Source],
+	[Urgency] AS [ServiceReq.Urgency],
+	[Subject] as [Summary],
+	[ResolutionEscLink_RecID],
+	[OrganizationUnitID] ,
+	[ProfileLoginId] AS [CustomerLoginId],
+	[TotalTimeSpent] ,
+	[Resolution] ,
+	[Symptom] AS [Description],
+	[RequestLocation] AS [RequestLocation-SIS_Code],
+	[RequestLocation_Valid],
+	[ReviewResult_Valid],
+	[TemplateName] as [TemplateName1],
+    ConvertedtoIncident,
+    ivnt_CILink_Category,
+	ivnt_CILink_RecID,
+	CI_OWNER_IS_STUDENT,
+	CI_ASSET_TAG,
+	CI_COMPUTERTYPETEXT,
+	CI_OWNER_RECID_2,  //probably not useful
+	PREVIOUS_CI_OWNER_IS_STUDENT,
+	PREVIOUS_CI_LOCKED
+	;
+SELECT RecId,
+	LastModDateTime,
+	LastModBy,
+	CreatedDateTime,
+	CreatedBy,
+	Owner,
+	"Owner_Valid",
+	OwnerTeam,
+	"OwnerTeam_Valid",
+	ServiceReqNumber,
+	ResolvedBy,
+	ResolvedDateTime,
+    ClosedBy,
+    ClosedDateTime,
+	"ProfileLink_RecID",
+	ProfileFullName,
+	CustomerLocation,
+	IsVIP,
+	"AlternateContactLink_RecID",
+	Status,
+	Service,
+	Source,
+	Urgency,
+	Subject,
+	"ResolutionEscLink_RecID",
+	OrganizationUnitID,
+	ProfileLoginId,
+	TotalTimeSpent,
+	Resolution,
+	Symptom,
+	RequestLocation,
+	"RequestLocation_Valid",
+	"ReviewResult_Valid",
+	TemplateName,
+	Category,
+	Subcategory,
+    ConvertedtoIncident,
+    //new fields 6/10/22 Sprint 17
+    ivnt_CILink_Category,
+	ivnt_CILink_RecID,
+	CI_OWNER_IS_STUDENT,
+	CI_ASSET_TAG,
+	CI_COMPUTERTYPETEXT,
+	CI_OWNER_RECID_2,  //probably not useful
+	PREVIOUS_CI_OWNER_IS_STUDENT,
+	PREVIOUS_CI_LOCKED
+FROM "IAMC_LCPS_PRD_NA".dbo.ServiceReq;
