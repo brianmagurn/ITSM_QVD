@@ -1,0 +1,82 @@
+//LIB CONNECT TO 'bis-us1.saasit.com,31441 (STAFF_bmagurn)';
+//LIB CONNECT TO 'Ivanti BI Server -NVZ- PRD (OLEDB) (staff_bmagurn)';
+LIB CONNECT TO 'DATA - ITSM (DW):SQL_ivanti_PRD (staff_bmagurn)';
+
+
+ LOAD *
+ ,'1' AS SurveyCompleted
+ 	,DUAL(A1_Text,A1_Score) as Answer01
+    ,DUAL(A2_Text,A2_Score) as Answer02
+    ,DUAL(A3_Text,A3_Score) as Answer03
+    ,DUAL(A4_Text,A4_Score) as Answer04
+    ,DUAL(A5_Text,A5_Score) as Answer05
+    ,A6_Text as Answer06
+    ,IF(IsNull(A6_Text),'0','1') as 'Suggestion provided'
+    ;
+ 
+ LOAD *
+ , ConvertToLocalTime([DateSubmitted], 'Eastern Time (US & Canada)') AS [DateTimeSubmittedLocal]
+ , ConvertToLocalTime([ClosedDateTime], 'Eastern Time (US & Canada)') AS [SurveySentDateTimeLocal]
+ ;
+ LOAD *;
+
+SurveysCompleted:
+
+SELECT S.Title, S.SurveyId, R.DateSubmitted, R.IdentifierType AS ParentType, R.SurveySessionId, I.ClosedDateTime,
+(CASE
+WHEN R.IdentifierType = 'Incident' THEN I.IncidentNumber
+WHEN R.IdentifierType = 'ServiceReq' THEN SR.ServiceReqNumber
+END) AS ParentId,
+(CASE
+WHEN R.IdentifierType = 'Incident' THEN I.Category
+WHEN R.IdentifierType = 'ServiceReq' THEN 'ServiceReq'
+END) AS Category,
+(CASE
+WHEN R.IdentifierType = 'Incident' THEN I.Service
+WHEN R.IdentifierType = 'ServiceReq' THEN SR.Service
+END) AS Service,
+(CASE
+WHEN R.IdentifierType = 'Incident' THEN I.IsVIP
+WHEN R.IdentifierType = 'ServiceReq' THEN SR.IsVIP
+END) AS VIP,
+(CASE
+WHEN R.IdentifierType = 'Incident' THEN I.Email
+WHEN R.IdentifierType = 'ServiceReq' THEN SR.Email
+END) AS ParentCustomerEmail,
+(CASE
+WHEN R.IdentifierType = 'Incident' THEN I.OwnerTeam
+WHEN R.IdentifierType = 'ServiceReq' THEN SR.OwnerTeam
+END) AS OwnerTeam,
+(CASE
+WHEN R.IdentifierType = 'Incident' THEN I.Owner
+WHEN R.IdentifierType = 'ServiceReq' THEN SR.Owner
+END) AS Owner,
+A1.QuestionText AS Question01, A1.NumericValue AS A1_Score, A1.AnswerText AS A1_Text, 
+A2.QuestionText AS Question02, A2.NumericValue AS A2_Score, A2.AnswerText AS A2_Text, 
+A3.QuestionText AS Question03, A3.NumericValue AS A3_Score, A3.AnswerText AS A3_Text, 
+A4.QuestionText AS Question04, A4.NumericValue AS A4_Score, A4.AnswerText AS A4_Text, 
+A5.QuestionText AS Question05, A5.NumericValue AS A5_Score, A5.AnswerText AS A5_Text,
+A6.QuestionText AS Question06, A6.NumericValue AS A6_Score, A6.AnswerText AS A6_Text
+
+FROM "IAMC_LCPS_PRD_NA".dbo.FRS_SurveySession R
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_Survey S ON R.SurveyId = S.SurveyId
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.Incident I ON R.Identifier = I.RecId
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.ServiceReq SR ON R.Identifier = SR.RecId
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyQuestion Q1 ON R.SurveyId = Q1.SurveyId AND Q1.PositionInSurvey = 0
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyAnswer A1 ON Q1.QuestionId = A1.QuestionId AND R.SurveySessionId = A1.SessionId
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyQuestion Q2 ON R.SurveyId = Q2.SurveyId AND Q2.PositionInSurvey = 1
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyAnswer A2 ON Q2.QuestionId = A2.QuestionId AND R.SurveySessionId = A2.SessionId
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyQuestion Q3 ON R.SurveyId = Q3.SurveyId AND Q3.PositionInSurvey = 2
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyAnswer A3 ON Q3.QuestionId = A3.QuestionId AND R.SurveySessionId = A3.SessionId
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyQuestion Q4 ON R.SurveyId = Q4.SurveyId AND Q4.PositionInSurvey = 3
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyAnswer A4 ON Q4.QuestionId = A4.QuestionId AND R.SurveySessionId = A4.SessionId
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyQuestion Q5 ON R.SurveyId = Q5.SurveyId AND Q5.PositionInSurvey = 4
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyAnswer A5 ON Q5.QuestionId = A5.QuestionId AND R.SurveySessionId = A5.SessionId
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyQuestion Q6 ON R.SurveyId = Q6.SurveyId AND Q6.PositionInSurvey = 5
+LEFT OUTER JOIN "IAMC_LCPS_PRD_NA".dbo.FRS_SurveyAnswer A6 ON Q6.QuestionId = A6.QuestionId AND R.SurveySessionId = A6.SessionId
+
+
+WHERE S.State='2'
+
+ORDER BY R.DateSubmitted DESC;
+Drop field [DateSubmitted];
