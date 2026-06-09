@@ -1,0 +1,54 @@
+//LIB CONNECT TO 'bis-us1.saasit.com,31441 (STAFF_bmagurn)';
+//LIB CONNECT TO 'Ivanti BI Server -NVZ- PRD (OLEDB) (staff_bmagurn)';
+LIB CONNECT TO 'DATA - ITSM (DW):SQL_ivanti_PRD (staff_bmagurn)';
+
+
+//NullAsValue [Location Team],[Location DigX Team],[Location Address],[Location Type],[Location RefreshCycle];
+NullAsValue *;
+Set NullValue = 'NULL';
+
+LOAD RecId as [Location RecId], 
+	Address as [Location Address], 
+	City as [Location City], 
+	State as [Location State], 
+	DDI_Support_Team as [Location DigX Team], 
+    Team as [Location Team],
+	//SIS_Code as [Location SIS_Code], 
+    //SIS_Code as [SCHOOL_CODE], 
+    AD_Code as [Location SIS_Code], 
+    AD_Code as [SCHOOL_CODE], 
+    
+	AD_Code as [Location AD_Code], 
+	Type as [Location Type], 
+	RefreshCycle as [Location RefreshCycle], 
+	LoudounLocationName as [Location Name];
+
+[Location]:
+SELECT RecId,
+	Address,
+	City,
+	State,
+	"DDI_Support_Team",
+    Team,
+	//"SIS_Code",
+	"AD_Code",
+	Type,
+	RefreshCycle,
+	LoudounLocationName
+FROM "IAMC_LCPS_PRD_NA".dbo.Location
+where LoudounLocationName is not null;
+
+//Join SIS_SCHOOL to get geodata by school code
+
+JOIN LOAD
+    SCHOOL_CODE,
+    S_TYPE,
+    SCH_DESC,
+    CLUSTER_CODE,
+    Latitude,
+    Longitude,
+    LatitudeLongitude,
+    WEBSITE_URL
+FROM [lib://DATA - Public (DW):SharedConnectToQvdPUB/SIS_SCHOOL.qvd]
+(qvd);
+
