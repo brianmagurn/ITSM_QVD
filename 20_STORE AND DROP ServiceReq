@@ -1,0 +1,4 @@
+//STORE * FROM [Incident] INTO 'lib://SharedConnectToQvdITSM/IncidentV1.QVD';
+//STORE * FROM [Task] INTO  'lib://SharedConnectToQvdITSM/TaskV1.QVD';
+STORE * FROM [ServiceReq] INTO 'lib://DATA - ITSM (DW):SharedConnectToQvdITSM/ServiceReqV1.QVD';
+//Drop TABLE [ServiceReq];
