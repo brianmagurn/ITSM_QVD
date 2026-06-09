@@ -1,0 +1,194 @@
+Set dataManagerTables = '','IncidentStatus','Incident';
+//This block renames script tables from non generated section which conflict with the names of managed tables
+
+For each name in $(dataManagerTables) 
+    Let index = 0;
+    Let currentName = name; 
+    Let tableNumber = TableNumber(name); 
+    Let matches = 0; 
+    Do while not IsNull(tableNumber) or (index > 0 and matches > 0)
+        index = index + 1; 
+        currentName = name & '-' & index; 
+        tableNumber = TableNumber(currentName) 
+        matches = Match('$(currentName)', $(dataManagerTables));
+    Loop 
+    If index > 0 then 
+            Rename Table '$(name)' to '$(currentName)'; 
+    EndIf; 
+Next; 
+Set dataManagerTables = ;
+
+
+Unqualify *;
+
+
+
+
+//LIB CONNECT TO 'bis-us1.saasit.com,31441 (STAFF_bmagurn)';
+//LIB CONNECT TO 'Ivanti BI Server -NVZ- PRD (OLEDB) (staff_bmagurn)';
+LIB CONNECT TO 'DATA - ITSM (DW):SQL_ivanti_PRD (staff_bmagurn)';
+
+
+
+
+IncidentStatus:
+Mapping LOAD * ;
+
+SELECT 
+	Status,
+	SortOrder
+    
+//	,ProgressBarPosition
+// , REcId
+FROM "IAMC_LCPS_PRD_NA".dbo.IncidentStatus;
+
+[Incident]:
+LOAD
+	ActualCategory,
+    ActualService,
+	[Category],
+	[Category_Valid],
+	[CauseCode],
+	[CauseCode_Valid],
+	[CreatedBy],
+    [ClosedBy],
+	//[CreatedDateTime],
+     // ----- DATE FIELDS GO HERE ------
+    ConvertToLocalTime([CreatedDateTime], 'Eastern Time (US & Canada)') AS [CreatedDateTimeLocal],
+    ConvertToLocalTime([ResolvedDateTime], 'Eastern Time (US & Canada)') AS [ResolvedDateTimeLocal] ,
+    ConvertToLocalTime([LastModDateTime], 'Eastern Time (US & Canada)') AS [LastModDateTimeLocal]  ,
+    ConvertToLocalTime([RespondedDateTime], 'Eastern Time (US & Canada)') AS [RespondedDateTimeLocal],
+    ConvertToLocalTime([ClosedDateTime], 'Eastern Time (US & Canada)') AS [ClosedDateTimeLocal],
+	[FirstCallResolution],
+	[Impact],
+    'Incident' as [TicketType],
+	[IncidentNumber] as [ID],
+     'https://lcps-amc.saasit.com/Default.aspx?Scope=ObjectWorkspace&CommandId=Search&ObjectType=Incident%23&CommandData=IncidentNumber%2c%3d%2c0%2c'&[IncidentNumber]&'%2cstring%2cAND%7c' as [Record Link],
+	[LastModBy],
+	//[LastModDateTime],
+	[Priority],
+	[ProfileFullName] as [Customer Name],
+	[ProfileLink_RecID],
+	[RecId],
+	[Resolution],
+	[Service],
+	[Service_Valid],
+	[Source],
+	//DUAL ([Status], APPLYMAP('IncidentStatus', [Status])) AS [Status],
+    [Status],
+    [Status] as [OriginalStatus],
+    //[Status],
+	[Subject] as 'Summary',
+	[Symptom] as 'Description',
+    [Urgency],
+    [Unresolved],
+	[Owner],
+	[Owner_Valid],
+	[OwnerTeam],
+	[OwnerTeam_Valid],
+	//[ResolvedDateTime],
+	[ResolvedBy],
+	[HoursOfOperation],
+	[CustomerLocation] as 'Location',
+	[ResolutionEscLink_RecID],
+	[ResponseEscLink_RecID],
+	[WaitingEscLink_RecID],
+	[ClosingEscLink_RecID],
+	[TotalTimeSpent],
+	[RespondedBy],
+	//[RespondedDateTime],
+	[ProgressBarPosition] AS [Incident.ProgressBarPosition],
+	[ResolvedByType],
+	[ReportedBy],
+	[CreatedByType],
+	[SendSurveyNotification],
+	[CustomerLocation_Valid],
+	[IsMasterIncident],
+	[EasyButtonPressed],
+	[CallBackNumber],
+	[Room],
+	[RoomAvailability],
+	[Vendor_Valid],
+	[Vendor],
+	[VendorReferenceNumber],
+	[ConvertedtoRequest],
+    //Repair Genie Fields added
+    	APIExternalTicket,
+    APIError,
+    ComputerNotFound,
+	CurrentComputer, CurrentComputer_Valid,
+	ComputerManualAssetTag,	ComputerManual_Valid,ComputerManual,
+	CurrentComputerPeripheralType, CurrentComputerPeripheralType_Valid, ComputerPeripheralISsue,
+   // ,[ResolutionEscLink_RecID]
+    ;
+SELECT 
+	//TOP 1000 
+	ActualCategory,
+    ActualService,
+    Category,
+	"Category_Valid",
+	CauseCode,
+	"CauseCode_Valid",
+	CreatedBy,
+	CreatedDateTime,
+    ClosedBy,
+    ClosedDateTime,
+	FirstCallResolution,
+	Impact,
+	IncidentNumber,
+	LastModBy,
+	LastModDateTime,
+	Priority,
+	ProfileFullName,
+	"ProfileLink_RecID",
+	RecId,
+	Resolution,
+	Service,
+	"Service_Valid",
+	Source,
+	Status,
+	Subject,
+	Symptom,
+	Urgency,
+    Unresolved,
+	Owner,
+	"Owner_Valid",
+	OwnerTeam,
+	"OwnerTeam_Valid",
+	ResolvedDateTime,
+	ResolvedBy,
+	HoursOfOperation,
+	CustomerLocation,
+	"ResolutionEscLink_RecID",
+	"ResponseEscLink_RecID",
+	"WaitingEscLink_RecID",
+	"ClosingEscLink_RecID",
+	TotalTimeSpent,
+	RespondedBy,
+	RespondedDateTime,
+	ProgressBarPosition,
+	ResolvedByType,
+	ReportedBy,
+	CreatedByType,
+	SendSurveyNotification,
+	"CustomerLocation_Valid",
+	IsMasterIncident,
+	EasyButtonPressed,
+	CallBackNumber,
+	Room,
+	RoomAvailability,
+	"Vendor_Valid",
+	Vendor,
+	VendorReferenceNumber,
+	ConvertedtoRequest,
+    ResolutionEscLink_RecID,
+    // repair genie fields added below
+   	APIExternalTicket,
+    APIError,
+    ComputerNotFound,
+	CurrentComputer, CurrentComputer_Valid,
+	ComputerManualAssetTag,	ComputerManual_Valid,ComputerManual,
+	CurrentComputerPeripheralType, CurrentComputerPeripheralType_Valid, ComputerPeripheralISsue 
+     
+FROM "IAMC_LCPS_PRD_NA".dbo.Incident
+Order By CreatedDAteTime DESC;
