@@ -1,0 +1,2 @@
+STORE * FROM [Location] INTO 'lib://DATA - ITSM (DW):SharedConnectToQvdITSM/LocationV1.QVD';
+DROP TABLE Location;
