@@ -1,0 +1,5 @@
+STORE * FROM Employee INTO 'lib://DATA - ITSM (DW):SharedConnectToQvdITSM/EmployeeV1.QVD';
+Drop Table Employee;
+
+STORE * FROM LinkedTeams INTO 'lib://DATA - ITSM (DW):SharedConnectToQvdITSM/LinkedTeamsV1.QVD';
+Drop Table LinkedTeams;
