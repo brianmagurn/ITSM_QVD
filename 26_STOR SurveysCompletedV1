@@ -1,0 +1,2 @@
+STORE * FROM SurveysCompleted INTO 'lib://DATA - ITSM (DW):SharedConnectToQvdITSM/SurveysCompleted_V1.QVD';
+DROP TABLE SurveysCompleted;
