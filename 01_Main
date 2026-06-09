@@ -1,4 +1,4 @@
-ET ThousandSep=',';
+SET ThousandSep=',';
 SET DecimalSep='.';
 SET MoneyThousandSep=',';
 SET MoneyDecimalSep='.';
